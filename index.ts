@@ -108,7 +108,7 @@ export class Light {
 	 * @returns {unknown}
 	 */
 	async setOff(): Promise<void> {
-		return this.setMode("off");
+		return this.setMode(deviceMode.off);
 	}
 	/**
 	 * Sets the state
@@ -116,7 +116,7 @@ export class Light {
 	 * @param {boolean} state - Set on/off
 	 */
 	async setState(state: boolean): Promise<void> {
-		return this.setMode(state ? "on" : "off");
+		return this.setMode(state ? deviceMode.color : deviceMode.off);
 	}
 
 	/**
@@ -223,11 +223,21 @@ export class Light {
 	}
 
 	/**
+	 * Gets the LED operation mode
+	 *
+	 * @returns {deviceMode} mode
+	 */
+	async getMode(): Promise<deviceMode> {
+		let res = await this.sendGetRequest("/led/mode", {});
+		let mode: deviceMode = (<any>deviceMode)[res.mode];
+		return mode;
+	}
+	/**
 	 * Sets the LED operation mode
 	 *
-	 * @param {string} mode One of ['demo', 'color', 'off']
+	 * @param {deviceMode} mode
 	 */
-	async setMode(mode: string): Promise<void> {
+	async setMode(mode: deviceMode): Promise<void> {
 		await this.sendPostRequest("/led/mode", { mode: mode });
 	}
 
@@ -323,4 +333,13 @@ export interface hsvColour {
 	saturation: number;
 	/** Value (brightness) 0..255 */
 	value: number;
+}
+export enum deviceMode {
+	demo = "demo",
+	color = "color",
+	off = "off",
+	effect = "effect",
+	movie = "movie",
+	playlist = "playlist",
+	rt = "rt",
 }
