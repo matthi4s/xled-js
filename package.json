@@ -5,7 +5,9 @@
   "homepage": "https://github.com/aeroniemi/xled#readme",
   "main": "index.js",
   "scripts": {
-    "docs": "./node_modules/.bin/jsdoc"
+    "docs": "npx typedoc",
+    "build": "tsc",
+    "watch": "tsc --watch"
   },
   "author": "Lexi Beavil (https://github.com/aeroniemi)",
   "repository": "github:aeroniemi/xled-js",
