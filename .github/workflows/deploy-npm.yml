@@ -1,3 +1,4 @@
+name: Deploy package to NPM
 on: 
   push:
     tags:
