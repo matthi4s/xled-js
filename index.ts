@@ -154,6 +154,16 @@ export class Light {
 			name: name,
 		});
 	}
+
+	/**
+	 * Gets time when lights will turn on and off
+	 *
+	 * @returns {Promise<timer>}
+	 */
+	async getTimer(): Promise<timer> {
+		let data: timer = await this.sendGetRequest("/timer");
+		return data;
+	}
 	/**
 	 * Sets the brightness level
 	 *
@@ -352,4 +362,12 @@ export enum deviceMode {
 	movie = "movie",
 	playlist = "playlist",
 	rt = "rt",
+}
+export interface timer {
+	/** Current time according to the device, seconds after midnight */
+	time_now: number;
+	/** Time to switch lights on, seconds after midnight. -1 if not set. */
+	time_on: number;
+	/** Time to switch lights off, seconds after midnight. -1 if not set. */
+	time_off: number;
 }
