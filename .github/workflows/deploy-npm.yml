@@ -3,6 +3,8 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    
 concurrency:
   group: "npm"
   cancel-in-progress: true
