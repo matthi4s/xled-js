@@ -102,6 +102,16 @@ export class Light {
 			await this.login();
 		}
 	}
+
+	/**
+	 * Gets details about the device
+	 *
+	 * @returns {Promise<object>} Results vary, see https://xled-docs.readthedocs.io/en/latest/rest_api.html#device-details
+	 */
+	async getDeviceDetails(): Promise<object> {
+		let data = await this.sendGetRequest("/gestalt");
+		return data;
+	}
 	/**
 	 * Turns the device off
 	 *
