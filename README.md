@@ -2,6 +2,10 @@
 
 A NodeJS/typescript library similar to [scrool/XLED](https://github.com/scrool/xled) to control [Twinkly](https://twinkly.com/) LED lights.
 
+## API Docs
+
+- The api docs can be found at https://aeroniemi.github.com/xled-js
+
 ## Installation
 
 ### Via npm
