@@ -10,7 +10,7 @@ A NodeJS/typescript library similar to [scrool/XLED](https://github.com/scrool/x
 
 ### Via npm
 
-`npm install xled`
+`npm install xled2`
 
 ### From source
 
