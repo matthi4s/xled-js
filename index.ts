@@ -135,7 +135,7 @@ export class Light {
 	 * @returns {Promise<string>} Name of device
 	 */
 	async getName(): Promise<string> {
-		let data = await this.sendGetRequest("/device_name", {});
+		let data = await this.sendGetRequest("/device_name");
 		let res: string = data.name;
 		return res;
 	}
@@ -287,11 +287,11 @@ export class Light {
 	 * @param {string} url
 	 * @param {object} params
 	 */
-	async sendGetRequest(url: string, params: object): Promise<any> {
+	async sendGetRequest(url: string, params?: object): Promise<any> {
 		if (!this.token) throw errNoToken;
 		let res: AxiosResponse;
 		try {
-			res = await this.net.get(url, params);
+			res = await this.net.get(url, params || {});
 		} catch (err) {
 			throw err;
 		}
