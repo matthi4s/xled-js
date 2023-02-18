@@ -24,12 +24,12 @@ export class Light {
 	 * @constructor
 	 * @param {string} ipaddr IP Address of the Twinkly device
 	 */
-	constructor(ipaddr: string) {
+	constructor(ipaddr: string, timeout: number = 1000) {
 		this.ipaddr = ipaddr;
 		this.challenge = randomBytes(256).toString("hex");
 		this.net = axios.create({
 			baseURL: `http://${this.ipaddr}/xled/v1/`,
-			timeout: 1000,
+			timeout: timeout,
 		});
 		this.activeLoginCall = false;
 	}
