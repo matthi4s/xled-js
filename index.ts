@@ -304,6 +304,20 @@ export class Light {
 		}
 		return res.data;
 	}
+	async getListOfMovies() {
+		let res = await this.sendGetRequest("/movies", {});
+		let movies: Movie[] = res.movies.map((data: any) => {
+			return new Movie(data);
+		});
+		return movies;
+	}
+	async addMovie(movie: Movie) {
+		await this.sendPostRequest("/movies/new", movie.export());
+	}
+	async getLayout() {
+		let res = await this.sendGetRequest("/led/layout/full", {});
+		return res;
+	}
 }
 /**
  * Represents an authentication token used to login to an xled instance
