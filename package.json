@@ -3,7 +3,7 @@
   "version": "1.2.2",
   "description": "Library to control Twinkly LED lights",
   "homepage": "https://github.com/aeroniemi/xled#readme",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "docs": "npx typedoc",
     "build": "tsc",
