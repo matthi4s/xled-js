@@ -17,7 +17,7 @@ export class Light {
 	net: AxiosInstance;
 	token: AuthenticationToken | undefined;
 	activeLoginCall: boolean;
-
+	nleds: number;
 	/**
 	 * Creates an instance of Light.
 	 *
@@ -334,6 +334,11 @@ export class Light {
 	async getLayout() {
 		let res = await this.sendGetRequest("/led/layout/full", {});
 		return res;
+	}
+	async getNLeds() {
+		if (this.nleds) return this.nleds;
+		let res: any = await this.getDeviceDetails();
+		this.nleds = res.number_of_led;
 	}
 }
 export class Movie {
