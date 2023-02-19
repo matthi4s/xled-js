@@ -228,6 +228,11 @@ export class Light {
 			blue: colour.blue,
 		});
 	}
+	async setRGBColourRealTime(colour: rgbColour): Promise<void> {
+		let frame = new OneColourFrame(colour, this.nleds);
+		console.log(frame);
+		await this.sendRealTimeFrame(frame);
+	}
 
 	/**
 	 * Sets the colour in HSV when in colour mode
