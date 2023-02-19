@@ -17,7 +17,7 @@ export class Light {
 	net: AxiosInstance;
 	token: AuthenticationToken | undefined;
 	activeLoginCall: boolean;
-	nleds: number;
+	nleds: number | undefined;
 	/**
 	 * Creates an instance of Light.
 	 *
@@ -229,7 +229,7 @@ export class Light {
 		});
 	}
 	async setRGBColourRealTime(colour: rgbColour): Promise<void> {
-		let frame = new OneColourFrame(colour, this.nleds);
+		let frame = new OneColourFrame(colour, await this.getNLeds());
 		console.log(frame);
 		await this.sendRealTimeFrame(frame);
 	}
@@ -343,7 +343,9 @@ export class Light {
 	async getNLeds() {
 		if (this.nleds) return this.nleds;
 		let res: any = await this.getDeviceDetails();
-		this.nleds = res.number_of_led;
+		let nleds: number = res.number_of_led;
+		this.nleds = nleds;
+		return nleds;
 	}
 }
 export class Movie {
