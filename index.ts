@@ -389,3 +389,41 @@ export interface timer {
 	/** Time to switch lights off, seconds after midnight. -1 if not set. */
 	time_off: number;
 }
+
+class Frame {
+	leds: Led[];
+	constructor(leds: Led[], nleds: number) {
+		this.leds = leds;
+	}
+	toOctet() {
+		let bytes = this.leds.map((led) => {
+			return led.toOctet();
+		});
+		let output = new Uint8Array(this.leds.length * 3);
+		let offset = 0;
+		bytes.forEach((item) => {
+			output.set(item, offset);
+			offset += item.length;
+		});
+		return output;
+	}
+}
+export class OneColourFrame extends Frame {
+	constructor(rgb: rgbColour, nleds: number) {
+		let leds: Led[] = Array(nleds).fill(new Led(rgb.red, rgb.green, rgb.blue));
+		super(leds, nleds);
+	}
+}
+class Led {
+	red: number;
+	green: number;
+	blue: number;
+	constructor(red: number, green: number, blue: number) {
+		this.red = red;
+		this.green = green;
+		this.blue = blue;
+	}
+	toOctet() {
+		return new Uint8Array([this.red, this.green, this.blue]);
+	}
+}
