@@ -109,7 +109,7 @@ export class Light {
 	 * @returns {Promise<object>} Results vary, see https://xled-docs.readthedocs.io/en/latest/rest_api.html#device-details
 	 */
 	async getDeviceDetails(): Promise<object> {
-		let data = await this.sendGetRequest("/gestalt");
+		let data = await this.sendGetRequest("/gestalt", undefined, false);
 		return data;
 	}
 	/**
@@ -287,8 +287,12 @@ export class Light {
 	 * @param {string} url
 	 * @param {object} params
 	 */
-	async sendGetRequest(url: string, params?: object): Promise<any> {
-		if (!this.token) throw errNoToken;
+	async sendGetRequest(
+		url: string,
+		params?: object,
+		requiresToken: boolean = true
+	): Promise<any> {
+		if (!this.token && requiresToken) throw errNoToken;
 		let res: AxiosResponse;
 		try {
 			res = await this.net.get(url, params || {});
