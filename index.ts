@@ -304,6 +304,23 @@ export class Light {
 		}
 		return res.data;
 	}
+	async sendRealTimeFrame(frame: Frame) {
+		if (!this.token) throw errNoToken;
+		let res: AxiosResponse;
+		try {
+			res = await this.net.post("/led/rt/frame", frame.toOctet(), {
+				headers: {
+					"Content-Type": "application/octet-stream",
+				},
+			});
+		} catch (err) {
+			throw err;
+		}
+		if (res.data.code != 1000) {
+			throw Error("Failed to send RT frame");
+		}
+		return res.data;
+	}
 	async getListOfMovies() {
 		let res = await this.sendGetRequest("/movies", {});
 		let movies: Movie[] = res.movies.map((data: any) => {
