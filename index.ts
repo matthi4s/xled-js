@@ -319,6 +319,36 @@ export class Light {
 		return res;
 	}
 }
+export class Movie {
+	id: number;
+	name: string;
+	unique_id: string;
+	descriptor_type: string;
+	leds_per_frame: number;
+	frames_number: number;
+	fps: number;
+	constructor(data: any) {
+		this.id = data.id;
+		this.name = data.name;
+		this.unique_id = data.unique_id;
+		this.descriptor_type = data.descriptor_type;
+		this.leds_per_frame = data.leds_per_frame;
+		this.frames_number = data.frames_number;
+		this.fps = data.fps;
+	}
+	export() {
+		return {
+			id: this.id,
+			name: this.name,
+			unique_id: this.unique_id,
+			descriptor_type: this.descriptor_type,
+			leds_per_frame: this.leds_per_frame,
+			frames: this.frames_number,
+			fps: this.fps,
+		};
+	}
+}
+
 /**
  * Represents an authentication token used to login to an xled instance
  * @internal
