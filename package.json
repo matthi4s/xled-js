@@ -13,6 +13,7 @@
   "files": [
     "dist/**/*"
   ],
+  "type": "module",
   "author": "Lexi Beavil (https://github.com/aeroniemi)",
   "repository": "github:aeroniemi/xled-js",
   "license": "MIT",
