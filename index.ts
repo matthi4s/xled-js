@@ -230,7 +230,6 @@ export class Light {
 	}
 	async setRGBColourRealTime(colour: rgbColour): Promise<void> {
 		let frame = new OneColourFrame(colour, await this.getNLeds());
-		console.log(frame);
 		await this.sendRealTimeFrame(frame);
 	}
 
@@ -325,6 +324,9 @@ export class Light {
 			throw Error("Failed to send RT frame");
 		}
 		return res.data;
+	}
+	async sendRealTimeFrameUDP(frame: Frame) {
+		
 	}
 	async getListOfMovies() {
 		let res = await this.sendGetRequest("/movies", {});
