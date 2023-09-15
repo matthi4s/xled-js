@@ -37,7 +37,7 @@ export class Light {
    * @constructor
    * @param {string} ipaddr IP Address of the Twinkly device
    */
-  constructor(ipaddr: string, timeout: number = 1000) {
+  constructor(ipaddr: string, timeout: number = 20000) {
     this.ipaddr = ipaddr;
     this.challenge = randomBytes(256).toString("hex");
     this.net = axios.create({
@@ -294,7 +294,6 @@ export class Light {
     let res: AxiosResponse;
     try {
       res = await this.net.post(url, data, {
-        timeout: 20000,
         headers: {
           "Content-Type": contentType,
         },
