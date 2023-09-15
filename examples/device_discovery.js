@@ -1,4 +1,4 @@
-import { discoverTwinklyDevices } from "../dist/discovery.js";
+import { discoverTwinklyDevices } from "../dist/index.js";
 
 const customTimeout = 3000;
 
