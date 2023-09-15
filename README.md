@@ -2,7 +2,7 @@
 
 A NodeJS/typescript library similar to [scrool/XLED](https://github.com/scrool/xled) to control [Twinkly](https://twinkly.com/) LED lights.
 
-A fork of the excellent work done by Lexi Beavil https://github.com/aeroniemi
+A fork of the excellent work done by Alexander Beavil https://github.com/aeroniemi
 
 This version includes partial refactoring for easier maintenance, a few new functions, API calls, and a new discovery service.
 
