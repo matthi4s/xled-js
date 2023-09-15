@@ -130,3 +130,6 @@ xled-js.code-workspace
 
 # Docs
 docs
+
+# Package Lock
+package-lock.json
