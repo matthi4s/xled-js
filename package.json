@@ -9,7 +9,7 @@
     "docs": "npx typedoc",
     "build": "tsc",
     "watch": "tsc --watch",
-    "test": "node ./test/test.js"
+    "test": "node ./examples/movie_upload.js"
   },
   "files": [
     "dist/**/*"
