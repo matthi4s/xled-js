@@ -127,3 +127,6 @@ dist
 .pnp.*
 test.ts
 xled-js.code-workspace
+
+# Docs
+docs
