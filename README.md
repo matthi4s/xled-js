@@ -4,7 +4,7 @@ A NodeJS/typescript library similar to [scrool/XLED](https://github.com/scrool/x
 
 A fork of the excellent work done by Alexander Beavil https://github.com/aeroniemi
 
-This version includes partial refactoring for easier maintenance, a few new functions, API calls, and a new discovery service.
+This version includes partial refactoring for easier maintenance, a few new functions, API calls, and a new discovery service.  This is technically a breaking change as all methods, interfaces, enums and variables that previously included the UK spelling of "colour" have been replaced with the US spelling "color".  This is a preference and obviously not necessary, but I'm from the US and I like it that way.
 
 ## API Docs
 
