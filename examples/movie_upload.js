@@ -2,15 +2,16 @@ import { Light, Frame, Movie, Led } from "../dist/index.js";
 
 async function run() {
   // instantiate the device
+  console.log("Creating device...");
   const device = new Light("192.168.1.164");
 
   let movie = makeMovie();
 
-  // get the device name
-  console.log(`This device is called ${await device.getName()}`);
   // must login before sending commands
   console.log("Logging in...");
   await device.login();
+  // get the device name
+  console.log(`This device is called ${await device.getName()}`);
   // adjust brightness
   console.log("Set device to full brightness");
   await device.setBrightness(100);
