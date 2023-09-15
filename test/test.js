@@ -32,26 +32,9 @@ async function run() {
   await device.sendMovieConfig(movie);
   console.log("Set device to movie mode");
   await device.setMode("movie");
-
-  // let frame = makeFrame();
-  // await device.setMode("rt");
-  // await device.sendRealTimeFrame(frame);
 }
 
 run();
-
-function makeFrame() {
-  const nLeds = 100;
-  let leds = [];
-  for (let i = 0; i < nLeds; i++) {
-    let r = Math.floor(Math.random() * 255);
-    let g = Math.floor(Math.random() * 255);
-    let b = Math.floor(Math.random() * 255);
-    leds[i] = new Led(r, g, b);
-  }
-  let frame = new Frame(leds);
-  return frame;
-}
 
 function makeMovie() {
   const nLeds = 600;
@@ -74,9 +57,9 @@ function makeMovie() {
         sparkle = 1;
       }
       if (i - j !== undefined) {
-        let r = 0; //Math.floor(255 * fade * saturation * sparkle);
-        let g = 0; //Math.floor(255 * fade * saturation * sparkle);
-        let b = 255; //Math.floor(255 * fade * sparkle);
+        let r = 0;
+        let g = 0;
+        let b = 255;
         leds[i - j] = new Led(r, g, b)
           .desaturate(desaturation)
           .brighten(sparkle)
@@ -87,14 +70,7 @@ function makeMovie() {
     let frame = new Frame(leds);
     frames.push(frame);
   }
-  // for (let i = 0; i < 100; i++) {
-  //   let leds = [];
-  //   for (let j = 0; j < nLeds; j++) {
-  //     leds[j] = new Led(0, 0, 0); // Set all leds to black first
-  //   }
-  //   let frame = new Frame(leds);
-  //   frames.push(frame);
-  // }
+
   let movie = new Movie({ frames: frames, fps: 30 });
 
   return movie;
