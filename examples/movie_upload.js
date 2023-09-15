@@ -1,35 +1,29 @@
-import {
-  Light,
-  Frame,
-  Movie,
-  Led,
-  // OneColorFrame,
-  // deviceMode,
-  // rgbColor,
-} from "../dist/index.js";
+import { Light, Frame, Movie, Led } from "../dist/index.js";
 
 async function run() {
   // instantiate the device
   const device = new Light("192.168.1.164");
 
-  await device.login();
+  let movie = makeMovie();
 
   // get the device name
   console.log(`This device is called ${await device.getName()}`);
-
-  // set device to red, full brightness
+  // must login before sending commands
+  console.log("Logging in...");
+  await device.login();
+  // adjust brightness
+  console.log("Set device to full brightness");
   await device.setBrightness(100);
-
-  let movie = makeMovie();
-
-  // Todo: make setMovie config accept movie object vice params
-
+  // turn off lights
+  console.log("Set device to off mode");
   await device.setMode("off");
-
+  // upload movie to device
   console.log("Send movie to device");
   await device.sendMovieToDevice(movie);
+  // set movie config
   console.log("Send movie config");
   await device.sendMovieConfig(movie);
+  // set device to movie mode
   console.log("Set device to movie mode");
   await device.setMode("movie");
 }
@@ -40,20 +34,19 @@ function makeMovie() {
   const nLeds = 600;
   const nFrames = 600;
   let tailLength = 15;
+  let black = new Led(0, 0, 0);
 
   let frames = [];
 
   for (let i = 0; i < nFrames; i++) {
-    let leds = [];
-    for (let j = 0; j < nLeds; j++) {
-      leds[j] = new Led(0, 0, 0); // Set all leds to black first
-    }
+    // Faster way to make a frame of LEDs of single color
+    let leds = Array(nLeds).fill(black);
+
     for (let j = 0; j < tailLength; j++) {
       let fade = (tailLength - j) / tailLength;
       let desaturation = (0.1 * j) / (tailLength - 1);
       let sparkle = Math.min(0, Math.random() - 0.3);
       if (j === 0) {
-        desaturation = 0;
         sparkle = 1;
       }
       if (i - j !== undefined) {
