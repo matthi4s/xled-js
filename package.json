@@ -22,7 +22,7 @@
     "led",
     "control"
   ],
-  "author": "Lexi Beavil (https://github.com/aeroniemi)",
+  "author": "commonstone@gmail.com",
   "repository": "github:foomoon/xled-js",
   "license": "MIT",
   "devDependencies": {
