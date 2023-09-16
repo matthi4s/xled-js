@@ -334,7 +334,7 @@ export class Light {
     let params = movie.export();
     let delay = Math.floor(1000 / params.fps);
     let number_of_leds = params.leds_per_frame;
-    let number_of_frames = params.frames;
+    let number_of_frames = params.frames_number;
 
     let data = {
       delay,
@@ -396,6 +396,12 @@ export class Light {
   }
   async addMovie(movie: Movie) {
     await this.sendPostRequest("/movies/new", movie.export());
+    let res = await this.sendPostRequest(
+      "/movies/full",
+      movie.toOctet(),
+      "application/octet-stream"
+    );
+    return res;
   }
   async getLayout() {
     let res = await this.sendGetRequest("/led/layout/full", {});

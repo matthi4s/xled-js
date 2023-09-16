@@ -18,12 +18,11 @@ async function run() {
   // turn off lights
   console.log("Set device to off mode");
   await device.setMode("off");
-  // upload movie to device
-  console.log("Send movie to device");
-  await device.sendMovieToDevice(movie);
-  // set movie config
-  console.log("Send movie config");
-  await device.sendMovieConfig(movie);
+  // get list of movies
+  let listOfMovies = await device.getListOfMovies();
+  console.log(listOfMovies);
+  // add movie to device (better way to do this)
+  await device.addMovie(movie);
   // set device to movie mode
   console.log("Set device to movie mode");
   await device.setMode("movie");
