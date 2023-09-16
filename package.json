@@ -6,7 +6,7 @@
   "homepage": "https://github.com/aeroniemi/xled#readme",
   "main": "dist/index.js",
   "scripts": {
-    "docs": "npx typedoc",
+    "docs": "npx typedoc ./src",
     "build": "tsc",
     "watch": "tsc --watch",
     "test": "node ./examples/movie_upload.js"
