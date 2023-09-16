@@ -129,7 +129,7 @@ test.ts
 xled-js.code-workspace
 
 # Docs
-docs
+# docs
 
 # Package Lock
 package-lock.json
