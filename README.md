@@ -112,7 +112,10 @@ async function run() {
 }
 
 run();
+```
 
+### Helper function to test Movie
+```ts
 function makeMovie() {
   const nLeds = 600;
   const nFrames = 600;
