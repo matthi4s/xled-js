@@ -80,7 +80,12 @@ export class Light {
     }
     this.activeLoginCall = false;
   }
-
+  /**
+   * Sends a logout request
+   */
+  async logout(): Promise<void> {
+    await this.sendPostRequest("/logout", {});
+  }
   /**
    * Check that we are logged in to the device
    */
@@ -116,7 +121,6 @@ export class Light {
       await this.login();
     }
   }
-
   /**
    * Gets details about the device
    *
@@ -179,6 +183,14 @@ export class Light {
     return data;
   }
   /**
+   * Sets the time when lights will turn on and off
+   *
+   * @param timer
+   */
+  async setTimer(timer: timer): Promise<void> {
+    await this.sendPostRequest("/timer", timer);
+  }
+  /**
    * Sets the brightness level
    *
    * @param {number} value
@@ -206,6 +218,34 @@ export class Light {
   async getBrightness(): Promise<number> {
     let data = await this.sendGetRequest("/led/out/brightness", {});
     return data.value;
+  }
+
+  /**
+   *
+   * @returns {Promise<number>} Current saturation in range 0..100
+   */
+  async getSaturation(): Promise<number> {
+    let data = await this.sendGetRequest("/led/out/saturation", {});
+    return data.value;
+  }
+
+  /**
+   * Sets the saturation level
+   *
+   * @param value
+   * @param mode
+   * @param type
+   */
+  async setSaturation(
+    value: number,
+    mode: string = "enabled",
+    type: string = "A"
+  ): Promise<void> {
+    await this.sendPostRequest("/led/out/saturation", {
+      value,
+      mode,
+      type,
+    });
   }
 
   /**
@@ -330,6 +370,12 @@ export class Light {
     }
     return res.data;
   }
+  /**
+   * Send a movie config to the device
+   *
+   * @param movie
+   * @returns
+   */
   async sendMovieConfig(movie: Movie) {
     let params = movie.export();
     let delay = Math.floor(1000 / params.fps);
@@ -348,6 +394,12 @@ export class Light {
     );
     return res;
   }
+  /**
+   * Send a movie to the device
+   *
+   * @param movie
+   * @returns
+   */
   async sendMovieToDevice(movie: Movie) {
     let res = await this.sendPostRequest(
       "led/movie/full",
@@ -356,6 +408,12 @@ export class Light {
     );
     return res;
   }
+  /**
+   * Send a realtime frame to device
+   *
+   * @param frame
+   * @returns
+   */
   async sendRealTimeFrame(frame: Frame) {
     let res = await this.sendPostRequest(
       "led/rt/frame",
@@ -364,6 +422,12 @@ export class Light {
     );
     return res;
   }
+  /**
+   * Send a realtime frame to device via UDP
+   * WARNING: This only works with nodejs
+   *
+   * @param frame
+   */
   async sendRealTimeFrameUDP(frame: Frame) {
     if (!this.token) throw errNoToken;
 
@@ -387,6 +451,11 @@ export class Light {
       }
     });
   }
+  /**
+   * Get a list of movies
+   *
+   * @returns {Promise<Movie[]>}
+   */
   async getListOfMovies() {
     let res = await this.sendGetRequest("/movies", {});
     let movies: Movie[] = res.movies.map((data: any) => {
@@ -394,6 +463,12 @@ export class Light {
     });
     return movies;
   }
+  /**
+   * Add a movie to the device
+   *
+   * @param movie
+   * @returns response from device
+   */
   async addMovie(movie: Movie) {
     await this.sendPostRequest("/movies/new", movie.export());
     let res = await this.sendPostRequest(
@@ -403,16 +478,139 @@ export class Light {
     );
     return res;
   }
+  /**
+   * Get the current layout of the LEDs
+   *
+   * @returns {Promise<object>} Layout of LEDs
+   */
   async getLayout() {
     let res = await this.sendGetRequest("/led/layout/full", {});
     return res;
   }
-  async getNLeds() {
+  /**
+   * Upload a layout of LEDs to the device
+   *
+   * @param coordinates
+   * @param source
+   * @param synthesized
+   * @param aspectXY
+   * @param aspectXZ
+   * @returns
+   */
+  async uploadLayout(
+    coordinates: object,
+    source: string = "3D",
+    synthesized: boolean = false,
+    aspectXY: number = 0,
+    aspectXZ: number = 0
+  ) {
+    let res = await this.sendPostRequest("/led/layout/full", {
+      coordinates,
+      source,
+      synthesized,
+      aspectXY,
+      aspectXZ,
+    });
+    return res;
+  }
+  /**
+   * Get the number of LEDs in the device
+   *
+   * @returns number of LEDs in the device
+   */
+  async getNLeds(): Promise<number> {
     if (this.nleds) return this.nleds;
     let res: any = await this.getDeviceDetails();
     let nleds: number = res.number_of_led;
     this.nleds = nleds;
     return nleds;
+  }
+  /**
+   * Get the current MQTT config
+   *
+   * @returns MQTT config
+   */
+  async getMqttConfig(): Promise<object> {
+    let res = await this.sendGetRequest("/mqtt/config", {});
+    return res;
+  }
+  /**
+   * Set the MQTT config
+   *
+   * @param config
+   * @returns response from device
+   */
+  async setMqttConfig(config: object): Promise<object> {
+    let res = await this.sendPostRequest("/mqtt/config", config);
+    return res;
+  }
+  /**
+   * Get the current playlist
+   *
+   * @returns response from device
+   */
+  async getPlaylist(): Promise<object> {
+    let res = await this.sendGetRequest("/playlist", {});
+    return res;
+  }
+  /**
+   * Create a new playlist
+   *
+   * @param playlist
+   * @returns response from device
+   */
+  async createPlaylist(playlist: object): Promise<object> {
+    let res = await this.sendPostRequest("/playlist", {});
+    return res;
+  }
+  /**
+   * Get device summary
+   *
+   * @returns response from device
+   */
+  async getSummary() {
+    let res = await this.sendGetRequest("/summary", {});
+    return res;
+  }
+  /**
+   * Get the current movie
+   *
+   * @returns response from device
+   */
+  async getCurrentMovie(): Promise<object> {
+    let res = await this.sendGetRequest("/movie/current", {});
+    return res;
+  }
+  /**
+   * Set the current movie
+   *
+   * @param id
+   * @returns response from device
+   */
+  async setCurrentMovie(id: number): Promise<object> {
+    // id must be between 0 and 15
+    if (id < 0 || id > 15) throw new Error("ID must be between 0 and 15");
+    let res = await this.sendPostRequest("/movie/current", id);
+    return res;
+  }
+  /**
+   * Get network status
+   * 
+   * @returns response from device
+   */
+  async getNetworkStatus(): Promise<object> {
+    let res = await this.sendGetRequest("/network/status", {});
+    return res;
+  }
+  /**
+   * Set network status
+   * 
+   * @param status 
+   * @returns 
+   */
+  async setNetworkStatus(status: object): Promise<object> {
+    let res = await this.sendPostRequest("/network/status", status);
+    return res;
   }
 }
 
