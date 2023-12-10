@@ -5,6 +5,7 @@ export class Movie {
   name: string;
   unique_id: string;
   descriptor_type: string;
+  loop_type: number;
   leds_per_frame: number;
   frames_number: number;
   fps: number;
@@ -14,6 +15,7 @@ export class Movie {
     this.name = data.name || "xled-js effect";
     this.unique_id = data.unique_id || generateUUID();
     this.descriptor_type = data.descriptor_type || "rgb_raw";
+    this.loop_type = data.loop_type || 0;
     this.leds_per_frame = data.leds_per_frame || 0;
     this.frames_number = data.frames_number || 0;
     this.fps = data.fps || 0;
@@ -30,6 +32,7 @@ export class Movie {
       unique_id: this.unique_id,
       descriptor_type: this.descriptor_type,
       leds_per_frame: this.leds_per_frame,
+      loop_type: this.loop_type,
       frames_number: this.frames_number,
       fps: this.fps,
     };
