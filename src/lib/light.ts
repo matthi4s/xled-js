@@ -395,6 +395,15 @@ export class Light {
     return res;
   }
   /**
+   * Get the movie config from the device
+   *
+   * @returns response from device
+   */
+  async getMovieConfig() {
+    let res = await this.sendGetRequest("led/movie/config", {});
+    return res;
+  }
+  /**
    * Send a movie to the device
    *
    * @param movie
@@ -595,7 +604,7 @@ export class Light {
   }
   /**
    * Get network status
-   * 
+   *
    * @returns response from device
    */
   async getNetworkStatus(): Promise<object> {
@@ -604,9 +613,9 @@ export class Light {
   }
   /**
    * Set network status
-   * 
-   * @param status 
-   * @returns 
+   *
+   * @param status
+   * @returns
    */
   async setNetworkStatus(status: object): Promise<object> {
     let res = await this.sendPostRequest("/network/status", status);
