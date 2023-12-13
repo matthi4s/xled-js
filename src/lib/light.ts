@@ -13,13 +13,9 @@ import {
   deviceMode,
   applicationResponseCode,
   timer,
+  coordinate,
+  layout,
 } from "./interfaces.js";
-
-type coordinate = {
-  x: number;
-  y: number;
-  z: number;
-};
 
 // create error
 let errNoToken = Error("No valid token");
@@ -372,7 +368,7 @@ export class Light {
       throw err;
     }
     if (res.data.code != applicationResponseCode.Ok) {
-      throw Error("Get Request failed");
+      throw Error(`Request failed with error code ${res.data.code}`);
     }
     return res.data;
   }
@@ -471,7 +467,7 @@ export class Light {
    *
    * @returns {Promise<Movie[]>}
    */
-  async getListOfMovies() {
+  async getListOfMovies(): Promise<Movie[]> {
     let res = await this.sendGetRequest("/movies", {});
     let movies: Movie[] = res.movies.map((data: any) => {
       return new Movie(data);
@@ -496,10 +492,10 @@ export class Light {
   /**
    * Get the current layout of the LEDs
    *
-   * @returns {Promise<object>} Layout of LEDs
+   * @returns {Promise<layout>} Layout of LEDs
    */
-  async getLayout() {
-    let res = await this.sendGetRequest("/led/layout/full", {});
+  async getLayout(): Promise<layout> {
+    let res: layout = await this.sendGetRequest("/led/layout/full", {});
     return res;
   }
   /**

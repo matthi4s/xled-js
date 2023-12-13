@@ -41,3 +41,18 @@ export interface timer {
   /** Time to switch lights off, seconds after midnight. -1 if not set. */
   time_off: number;
 }
+
+export interface coordinate {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export interface layout {
+  source: string;
+  synthesized: boolean;
+  uuid: string;
+  coordinates: coordinate[];
+  code: applicationResponseCode;
+}
+
