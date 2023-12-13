@@ -15,6 +15,12 @@ import {
   timer,
 } from "./interfaces.js";
 
+type coordinate = {
+  x: number;
+  y: number;
+  z: number;
+};
+
 // create error
 let errNoToken = Error("No valid token");
 
@@ -507,7 +513,7 @@ export class Light {
    * @returns
    */
   async uploadLayout(
-    coordinates: object,
+    coordinates: coordinate[],
     source: string = "3D",
     synthesized: boolean = false,
     aspectXY: number = 0,
@@ -569,7 +575,7 @@ export class Light {
    * @returns response from device
    */
   async createPlaylist(playlist: object): Promise<object> {
-    let res = await this.sendPostRequest("/playlist", {});
+    let res = await this.sendPostRequest("/playlist", playlist);
     return res;
   }
   /**
