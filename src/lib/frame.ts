@@ -26,14 +26,11 @@ export class Frame {
    * @returns {Uint8Array}
    */
   toOctet(): Uint8Array {
-    let bytes = this.leds.map((led) => {
-      return led.toOctet();
-    });
     let output = new Uint8Array(this.leds.length * 3);
     let offset = 0;
-    bytes.forEach((item) => {
-      output.set(item, offset);
-      offset += item.length;
+    this.leds.forEach((led) => {
+      output.set(led.toOctet(), offset);
+      offset += 3;
     });
     return output;
   }
