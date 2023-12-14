@@ -20,7 +20,14 @@ async function run() {
   await device.setMode("off");
   // get list of movies
   let listOfMovies = await device.getListOfMovies();
-  console.log(listOfMovies);
+  console.log(`List of movies: ${listOfMovies.length}`);
+  console.log(listOfMovies.map((m) => m.name));
+  console.log(listOfMovies[0]);
+  console.log(await device.getPlaylist());
+  return;
+  console.log("Uploading movie...");
+
+  // return;
   // add movie to device (better way to do this)
   await device.addMovie(movie);
   // set device to movie mode
@@ -33,19 +40,22 @@ run();
 function makeMovie() {
   const nLeds = 600;
   const nFrames = 600;
-  let tailLength = 15;
-  let black = new Led(0, 0, 0);
+  const tailLength = 15;
+  const black = new Led(0, 0, 0);
+  const fps = 15;
+  const frames = [];
+  const saturationFactor = 0.5;
+  const nBufferFrames = 3 * fps;
+  const step = 3;
 
-  let frames = [];
-
-  for (let i = 0; i < nFrames; i++) {
+  for (let i = 0; i < nFrames; i += step) {
     // Faster way to make a frame of LEDs of single color
     let leds = Array(nLeds).fill(black);
 
     for (let j = 0; j < tailLength; j++) {
-      let fade = (tailLength - j) / tailLength;
-      let desaturation = (0.1 * j) / (tailLength - 1);
-      let sparkle = Math.min(0, Math.random() - 0.3);
+      let fade = (tailLength - j) / tailLength; // fade as j increases towards tail end
+      let desaturation = (saturationFactor * j) / (tailLength - 1); // desaturate as j increases
+      let sparkle = Math.min(0, Math.random() - 0.3); // add some random sparkle
       if (j === 0) {
         sparkle = 1;
       }
@@ -54,17 +64,22 @@ function makeMovie() {
         let g = 0;
         let b = 255;
         leds[i - j] = new Led(r, g, b)
+          // .desaturate(1)
           .desaturate(desaturation)
-          .brighten(sparkle)
-          .brighten(fade)
-          .brighten(i ** 1 / nFrames ** 1);
+          // .brighten(sparkle)
+          .brighten(fade);
+        // .brighten(i ** 1 / nFrames ** 1);
       }
     }
     let frame = new Frame(leds);
     frames.push(frame);
   }
 
-  let movie = new Movie({ frames: frames, fps: 30 });
+  for (let i = 0; i < nBufferFrames; i++) {
+    frames.push(new Frame(Array(nLeds).fill(black)));
+  }
+
+  let movie = new Movie({ frames, fps, name: "fairy_15fps" });
 
   return movie;
 }
