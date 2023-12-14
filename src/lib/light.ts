@@ -7,6 +7,35 @@ import { Led } from "./led.js";
 import { Frame } from "./frame.js";
 import { Movie } from "./movie.js";
 
+let generateRandomHex: (bytes: any) => any;
+
+if (typeof window === "undefined") {
+  // Node.js environment
+  generateRandomHex = (bytes: any) => randomBytes(bytes).toString("hex");
+} else if (window.crypto && window.crypto.getRandomValues) {
+  // Modern browser with window.crypto support
+  generateRandomHex = async (bytes: any) => {
+    const randomBytes = new Uint8Array(bytes);
+    window.crypto.getRandomValues(randomBytes);
+    const hexArray = Array.from(randomBytes, (byte) =>
+      byte.toString(16).padStart(2, "0")
+    );
+    return hexArray.join("");
+  };
+} else {
+  // Fallback for older browsers
+  generateRandomHex = (bytes: any) => {
+    const randomBytes = new Array(bytes);
+    for (let i = 0; i < bytes; i++) {
+      randomBytes[i] = Math.floor(Math.random() * 256);
+    }
+    const hexArray = randomBytes.map((byte) =>
+      byte.toString(16).padStart(2, "0")
+    );
+    return hexArray.join("");
+  };
+}
+
 import {
   rgbColor,
   hsvColor,
@@ -41,7 +70,8 @@ export class Light {
    */
   constructor(ipaddr: string, timeout: number = 20000) {
     this.ipaddr = ipaddr;
-    this.challenge = randomBytes(256).toString("hex");
+    // this.challenge = randomBytes(256).toString("hex");
+    this.challenge = generateRandomHex(256);
     this.net = axios.create({
       baseURL: `http://${this.ipaddr}/xled/v1/`,
       timeout: timeout,
