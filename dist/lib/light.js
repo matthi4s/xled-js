@@ -14,6 +14,31 @@ import * as udp from "node:dgram";
 import { Led } from "./led.js";
 import { Frame } from "./frame.js";
 import { Movie } from "./movie.js";
+let generateRandomHex;
+if (typeof window === "undefined") {
+    // Node.js environment
+    generateRandomHex = (bytes) => randomBytes(bytes).toString("hex");
+}
+else if (window.crypto && window.crypto.getRandomValues) {
+    // Modern browser with window.crypto support
+    generateRandomHex = (bytes) => __awaiter(void 0, void 0, void 0, function* () {
+        const randomBytes = new Uint8Array(bytes);
+        window.crypto.getRandomValues(randomBytes);
+        const hexArray = Array.from(randomBytes, (byte) => byte.toString(16).padStart(2, "0"));
+        return hexArray.join("");
+    });
+}
+else {
+    // Fallback for older browsers
+    generateRandomHex = (bytes) => {
+        const randomBytes = new Array(bytes);
+        for (let i = 0; i < bytes; i++) {
+            randomBytes[i] = Math.floor(Math.random() * 256);
+        }
+        const hexArray = randomBytes.map((byte) => byte.toString(16).padStart(2, "0"));
+        return hexArray.join("");
+    };
+}
 import { deviceMode, applicationResponseCode, } from "./interfaces.js";
 // create error
 let errNoToken = Error("No valid token");
@@ -31,7 +56,8 @@ export class Light {
      */
     constructor(ipaddr, timeout = 20000) {
         this.ipaddr = ipaddr;
-        this.challenge = randomBytes(256).toString("hex");
+        // this.challenge = randomBytes(256).toString("hex");
+        this.challenge = generateRandomHex(256);
         this.net = axios.create({
             baseURL: `http://${this.ipaddr}/xled/v1/`,
             timeout: timeout,
