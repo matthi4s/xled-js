@@ -61,7 +61,7 @@ export class Light {
   token: AuthenticationToken | undefined;
   activeLoginCall: boolean;
   nleds: number | undefined;
-  udpClient: udp.Socket;
+  udpClient: any; //udp.Socket;
   /**
    * Creates an instance of Light.
    *
@@ -80,7 +80,7 @@ export class Light {
     if (typeof window === "undefined") {
       this.udpClient = udp.createSocket("udp4");
     } else {
-      this.udpClient = new udp.Socket();
+      this.udpClient = null;
     }
   }
   async autoEndLoginCall(): Promise<void> {
@@ -476,6 +476,8 @@ export class Light {
   async sendRealTimeFrameUDP(frame: Frame) {
     if (!this.token) throw errNoToken;
 
+    if (!this.udpClient) throw new Error("UDP not supported in browser");
+
     // Generate the header
     let tokenArray = this.token.getTokenDecoded();
     let udpHeader = Buffer.alloc(tokenArray.length + 4);
@@ -490,7 +492,7 @@ export class Light {
     const data = Buffer.alloc(udpHeader.length + frame.getNLeds() * 3);
     data.fill(udpHeader);
     data.fill(frame.toOctet(), udpHeader.length);
-    this.udpClient.send(data, 7777, this.ipaddr, (error) => {
+    this.udpClient.send(data, 7777, this.ipaddr, (error: any) => {
       if (error) {
         console.warn(error);
       }

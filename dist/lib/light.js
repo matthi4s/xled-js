@@ -67,7 +67,7 @@ export class Light {
             this.udpClient = udp.createSocket("udp4");
         }
         else {
-            this.udpClient = new udp.Socket();
+            this.udpClient = null;
         }
     }
     autoEndLoginCall() {
@@ -488,6 +488,8 @@ export class Light {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.token)
                 throw errNoToken;
+            if (!this.udpClient)
+                throw new Error("UDP not supported in browser");
             // Generate the header
             let tokenArray = this.token.getTokenDecoded();
             let udpHeader = Buffer.alloc(tokenArray.length + 4);

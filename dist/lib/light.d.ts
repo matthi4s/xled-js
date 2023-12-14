@@ -1,7 +1,5 @@
 /// <reference types="node" />
-/// <reference types="node" />
 import { AxiosInstance, AxiosResponse } from "axios";
-import * as udp from "node:dgram";
 import { Frame } from "./frame.js";
 import { Movie } from "./movie.js";
 import { rgbColor, hsvColor, deviceMode, timer, coordinate, layout } from "./interfaces.js";
@@ -17,7 +15,7 @@ export declare class Light {
     token: AuthenticationToken | undefined;
     activeLoginCall: boolean;
     nleds: number | undefined;
-    udpClient: udp.Socket;
+    udpClient: any;
     /**
      * Creates an instance of Light.
      *
