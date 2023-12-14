@@ -63,7 +63,12 @@ export class Light {
             timeout: timeout,
         });
         this.activeLoginCall = false;
-        this.udpClient = udp.createSocket("udp4");
+        if (typeof window === "undefined") {
+            this.udpClient = udp.createSocket("udp4");
+        }
+        else {
+            this.udpClient = new udp.Socket();
+        }
     }
     autoEndLoginCall() {
         return __awaiter(this, void 0, void 0, function* () {
