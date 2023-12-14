@@ -20,10 +20,42 @@ async function run() {
   let details = await twinkly.getDeviceDetails();
   let nleds = details.number_of_led;
 
-  await twinkly.uploadLayout(randomLayout(nleds), "2d", true);
+  // let layout = await twinkly.getLayout();
+
+  // await twinkly.uploadLayout(randomLayout(nleds), "2d", true);
 
   let layout = await twinkly.getLayout();
+  // layout.coordinates = flipYZ(layout.coordinates);
   console.log(layout);
+
+  // use reduce to find the min and max values of x, y, and z
+  // let minMax = layout.coordinates.reduce(
+  //   (acc, coord) => {
+  //     acc.minX = Math.min(acc.minX, coord.x);
+  //     acc.maxX = Math.max(acc.maxX, coord.x);
+  //     acc.minY = Math.min(acc.minY, coord.y);
+  //     acc.maxY = Math.max(acc.maxY, coord.y);
+  //     acc.minZ = Math.min(acc.minZ, coord.z);
+  //     acc.maxZ = Math.max(acc.maxZ, coord.z);
+  //     return acc;
+  //   },
+  //   {
+  //     minX: Infinity,
+  //     maxX: -Infinity,
+  //     minY: Infinity,
+  //     maxY: -Infinity,
+  //     minZ: Infinity,
+  //     maxZ: -Infinity,
+  //   }
+  // );
+
+  // console.log(minMax);
+  // console.log(
+  //   layout.coordinates.filter((coord) => coord.z === minMax.minZ).length
+  // );
+
+  // await twinkly.uploadLayout(layout.coordinates, "2D", true);
+
   // get list of movies
   // let listOfMovies = await twinkly.getListOfMovies();
   // console.log(listOfMovies);
@@ -46,4 +78,14 @@ function randomLayout(n) {
     });
   }
   return coords;
+}
+
+function flipYZ(coords) {
+  return coords.map((coord) => {
+    return {
+      x: coord.x,
+      y: coord.z,
+      z: coord.y,
+    };
+  });
 }
