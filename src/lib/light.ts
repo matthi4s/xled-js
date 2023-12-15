@@ -97,6 +97,7 @@ export class Light {
     this.autoEndLoginCall();
     let res: AxiosResponse;
     this.challenge = await generateRandomHex(256);
+
     try {
       res = await this.net.post("/login", {
         challenge: this.challenge,
