@@ -57,7 +57,7 @@ export class Light {
     constructor(ipaddr, timeout = 20000) {
         this.ipaddr = ipaddr;
         // this.challenge = randomBytes(256).toString("hex");
-        this.challenge = generateRandomHex(256);
+        // this.challenge = generateRandomHex(256);
         this.net = axios.create({
             baseURL: `http://${this.ipaddr}/xled/v1/`,
             timeout: timeout,
@@ -86,6 +86,7 @@ export class Light {
             this.activeLoginCall = true;
             this.autoEndLoginCall();
             let res;
+            this.challenge = yield generateRandomHex(256);
             try {
                 res = yield this.net.post("/login", {
                     challenge: this.challenge,
