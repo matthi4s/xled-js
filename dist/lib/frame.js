@@ -21,7 +21,8 @@ export class Frame {
      * @returns {Uint8Array}
      */
     toOctet() {
-        let output = new Uint8Array(this.leds.length * 3);
+        let buffer = new ArrayBuffer(this.leds.length * 3);
+        let output = new Uint8Array(buffer);
         let offset = 0;
         this.leds.forEach((led) => {
             output.set(led.toOctet(), offset);
