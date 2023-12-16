@@ -24,7 +24,7 @@ async function run() {
   console.log(listOfMovies.map((m) => m.name));
   console.log(listOfMovies[0]);
   console.log(await device.getPlaylist());
-  return;
+  // return;
   console.log("Uploading movie...");
 
   // return;
