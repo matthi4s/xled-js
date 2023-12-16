@@ -72,6 +72,7 @@ export class Light {
     this.ipaddr = ipaddr;
     // this.challenge = randomBytes(256).toString("hex");
     // this.challenge = generateRandomHex(256);
+    this.challenge = ""; // default value, will be set in login()
     this.net = axios.create({
       baseURL: `http://${this.ipaddr}/xled/v1/`,
       timeout: timeout,

@@ -11,19 +11,31 @@ export class Movie {
   fps: number;
   frameData: Frame[];
   constructor(data: any) {
-    this.id = data.id || 0;
+    // Required for toOctet()
+    console.log(data);
+    this.frameData = data.frames || null;
+
+    // Check if all frames are the same length
+    if (this.frameData != null) {
+      let leds_per_frame = 0;
+      this.frameData.forEach((frame) => {
+        if (frame.getNLeds() != leds_per_frame && leds_per_frame != 0)
+          throw new Error("Frames must all be the same length");
+        leds_per_frame = frame.getNLeds();
+      });
+    }
+
+    // Required for export()
     this.name = data.name || "xled-js effect";
     this.unique_id = data.unique_id || generateUUID();
     this.descriptor_type = data.descriptor_type || "rgb_raw";
-    this.loop_type = data.loop_type || 0;
-    this.leds_per_frame = data.leds_per_frame || 0;
-    this.frames_number = data.frames_number || 0;
+    this.leds_per_frame = data.leds_per_frame || this.frameData[0].getNLeds();
+    this.frames_number = data.frames_number || this.frameData.length;
     this.fps = data.fps || 0;
-    this.frameData = data.frames || null;
-    if (this.frameData) {
-      this.frames_number = this.frameData.length;
-      this.leds_per_frame = this.frameData[0].getNLeds();
-    }
+
+    // Not used yet
+    this.id = data.id || 0;
+    this.loop_type = data.loop_type || 0;
   }
   export() {
     return {
@@ -41,7 +53,10 @@ export class Movie {
     const frames = this.frameData;
     this.frames_number = frames.length;
     this.leds_per_frame = frames[0].getNLeds();
-    const output = new Uint8Array(this.frames_number * this.leds_per_frame * 3);
+    const buffer = new ArrayBuffer(
+      this.frames_number * this.leds_per_frame * 3
+    );
+    const output = new Uint8Array(buffer);
     frames.forEach((frame, index) => {
       if (frame.getNLeds() != this.leds_per_frame)
         throw new Error("Frames must all be the same length");
