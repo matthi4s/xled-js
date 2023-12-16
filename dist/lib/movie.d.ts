@@ -19,5 +19,5 @@ export declare class Movie {
         frames_number: number;
         fps: number;
     };
-    toOctet(): ArrayBufferLike;
+    toOctet(): Uint8Array;
 }

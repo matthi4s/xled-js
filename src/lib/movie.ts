@@ -49,7 +49,7 @@ export class Movie {
       fps: this.fps,
     };
   }
-  toOctet() {
+  toOctet(): Uint8Array {
     const frames = this.frameData;
     this.frames_number = frames.length;
     this.leds_per_frame = frames[0].getNLeds();
@@ -69,7 +69,7 @@ export class Movie {
       output.set(octet, offset);
     });
     // this.frameData = output;
-    return output.buffer;
+    return output; //.buffer;
   }
 }
 

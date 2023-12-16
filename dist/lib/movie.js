@@ -51,7 +51,7 @@ export class Movie {
             output.set(octet, offset);
         });
         // this.frameData = output;
-        return output.buffer;
+        return output; //.buffer;
     }
 }
 function generateUUID() {
