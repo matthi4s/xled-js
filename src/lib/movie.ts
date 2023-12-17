@@ -12,7 +12,6 @@ export class Movie {
   frameData: Frame[];
   constructor(data: any) {
     // Required for toOctet()
-    console.log(data);
     this.frameData = data.frames || null;
 
     // Check if all frames are the same length
