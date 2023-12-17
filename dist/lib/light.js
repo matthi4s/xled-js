@@ -402,6 +402,28 @@ export class Light {
         });
     }
     /**
+     *
+     * @param {string} url
+     * @param {object} data
+     */
+    sendDeleteRequest(url, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.token)
+                throw errNoToken;
+            let res;
+            try {
+                res = yield this.net.delete(url, data);
+            }
+            catch (err) {
+                throw err;
+            }
+            if (res.data.code != applicationResponseCode.Ok) {
+                throw Error(`Mode set failed with error code ${res.data.code}`);
+            }
+            return res.data;
+        });
+    }
+    /**
      * Sends a GET request to the device, appending the required tokens
      *
      * @param {string} url
@@ -535,6 +557,16 @@ export class Light {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.sendPostRequest("/movies/new", movie.export());
             let res = yield this.sendPostRequest("/movies/full", movie.toOctet(), "application/octet-stream");
+            return res;
+        });
+    }
+    /**
+     *
+     * @returns response from device
+     */
+    deleteMovies() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let res = yield this.sendDeleteRequest("/movies", {});
             return res;
         });
     }

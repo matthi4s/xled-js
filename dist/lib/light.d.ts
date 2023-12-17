@@ -154,6 +154,12 @@ export declare class Light {
      */
     sendPostRequest(url: string, data: any, contentType?: string): Promise<any>;
     /**
+     *
+     * @param {string} url
+     * @param {object} data
+     */
+    sendDeleteRequest(url: string, data: any): Promise<any>;
+    /**
      * Sends a GET request to the device, appending the required tokens
      *
      * @param {string} url
@@ -207,6 +213,11 @@ export declare class Light {
      * @returns response from device
      */
     addMovie(movie: Movie): Promise<any>;
+    /**
+     *
+     * @returns response from device
+     */
+    deleteMovies(): Promise<any>;
     /**
      * Get the current layout of the LEDs
      *

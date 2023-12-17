@@ -387,6 +387,25 @@ export class Light {
   }
 
   /**
+   *
+   * @param {string} url
+   * @param {object} data
+   */
+  async sendDeleteRequest(url: string, data: any): Promise<any> {
+    if (!this.token) throw errNoToken;
+    let res: AxiosResponse;
+    try {
+      res = await this.net.delete(url, data);
+    } catch (err) {
+      throw err;
+    }
+    if (res.data.code != applicationResponseCode.Ok) {
+      throw Error(`Mode set failed with error code ${res.data.code}`);
+    }
+    return res.data;
+  }
+
+  /**
    * Sends a GET request to the device, appending the required tokens
    *
    * @param {string} url
@@ -526,6 +545,14 @@ export class Light {
       movie.toOctet(),
       "application/octet-stream"
     );
+    return res;
+  }
+  /**
+   *
+   * @returns response from device
+   */
+  async deleteMovies() {
+    let res = await this.sendDeleteRequest("/movies", {});
     return res;
   }
   /**
