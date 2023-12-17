@@ -22,8 +22,9 @@ async function run() {
   let listOfMovies = await device.getListOfMovies();
   console.log(`List of movies: ${listOfMovies.length}`);
   console.log(listOfMovies.map((m) => m.name));
-  console.log(listOfMovies[0]);
-  console.log(await device.getPlaylist());
+  // console.log(listOfMovies[0]);
+  // console.log("Get playlist");
+  // console.log(await device.getPlaylist());
   // return;
   console.log("Uploading movie...");
 
@@ -33,6 +34,7 @@ async function run() {
   // set device to movie mode
   console.log("Set device to movie mode");
   await device.setMode("movie");
+  console.log("DONE!!");
 }
 
 run();
