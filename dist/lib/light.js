@@ -10,41 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { generateRandomHex } from "./utils.js";
 import axios from "axios";
 import delay from "delay";
-import * as udp from "node:dgram";
+// dynamically import udp for compatibility with browser
+// import * as udp from "node:dgram";
 import { Led } from "./led.js";
 import { Frame } from "./frame.js";
 import { Movie } from "./movie.js";
-// let generateRandomHex: (bytes: any) => any;
-// if (typeof window === "undefined") {
-//   // Node.js environment
-//   generateRandomHex = async (bytes: any) => {
-//     const cryptoModule = await import("node:crypto");
-//     const randomBytes = cryptoModule.randomBytes;
-//     return randomBytes(bytes).toString("hex");
-//   };
-// } else if (window.crypto && window.crypto.getRandomValues) {
-//   // Modern browser with window.crypto support
-//   generateRandomHex = async (bytes: any) => {
-//     const randomBytes = new Uint8Array(bytes);
-//     window.crypto.getRandomValues(randomBytes);
-//     const hexArray = Array.from(randomBytes, (byte) =>
-//       byte.toString(16).padStart(2, "0")
-//     );
-//     return hexArray.join("");
-//   };
-// } else {
-//   // Fallback for older browsers
-//   generateRandomHex = (bytes: any) => {
-//     const randomBytes = new Array(bytes);
-//     for (let i = 0; i < bytes; i++) {
-//       randomBytes[i] = Math.floor(Math.random() * 256);
-//     }
-//     const hexArray = randomBytes.map((byte) =>
-//       byte.toString(16).padStart(2, "0")
-//     );
-//     return hexArray.join("");
-//   };
-// }
 import { deviceMode, applicationResponseCode, } from "./interfaces.js";
 // create error
 let errNoToken = Error("No valid token");
@@ -62,20 +32,30 @@ export class Light {
      */
     constructor(ipaddr, timeout = 20000) {
         this.ipaddr = ipaddr;
-        // this.challenge = randomBytes(256).toString("hex");
-        // this.challenge = generateRandomHex(256);
         this.challenge = ""; // default value, will be set in login()
         this.net = axios.create({
             baseURL: `http://${this.ipaddr}/xled/v1/`,
             timeout: timeout,
         });
         this.activeLoginCall = false;
-        if (typeof window === "undefined") {
-            this.udpClient = udp.createSocket("udp4");
-        }
-        else {
-            this.udpClient = null;
-        }
+        // dynamically import udp asynchroniously with IIFE
+        (() => __awaiter(this, void 0, void 0, function* () {
+            let udp;
+            if (typeof window === "undefined") {
+                // Handle the case for Node.js environments
+                try {
+                    udp = yield import("node:dgram");
+                    this.udpClient = udp.createSocket("udp4");
+                }
+                catch (error) {
+                    throw new Error("Failed to import node:dgram: " + error.message);
+                }
+            }
+            else {
+                // Handle the case for non-Node.js environments
+                this.udpClient = null;
+            }
+        }))();
     }
     autoEndLoginCall() {
         return __awaiter(this, void 0, void 0, function* () {
