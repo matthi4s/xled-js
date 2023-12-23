@@ -3,7 +3,8 @@ import { Light, Frame, Movie, Led } from "../dist/index.js";
 async function run() {
   // instantiate the device
   console.log("Creating device...");
-  const device = new Light("192.168.1.164");
+  const addresses = ["192.168.4.1", "192.168.1.164"];
+  const device = new Light(addresses[1]);
 
   let movie = makeMovie();
 
@@ -30,6 +31,8 @@ async function run() {
 
   // return;
   // add movie to device (better way to do this)
+  console.log("File size", `${movie.size() / 1000} kb`);
+
   await device.addMovie(movie);
   // set device to movie mode
   console.log("Set device to movie mode");
@@ -84,4 +87,23 @@ function makeMovie() {
   let movie = new Movie({ frames, fps, name: "fairy_15fps" });
 
   return movie;
+}
+
+function reorderArray(array) {
+  // Ensure the array has an even length
+  if (array.length % 2 !== 0) {
+    throw new Error("Array length must be even");
+  }
+
+  // Calculate the middle index
+  let middleIndex = array.length / 2;
+
+  // Split and reverse the first half of the array
+  let firstHalf = array.slice(0, middleIndex).reverse();
+
+  // Extract the second half of the array
+  let secondHalf = array.slice(middleIndex);
+
+  // Concatenate the two halves
+  return firstHalf.concat(secondHalf);
 }
