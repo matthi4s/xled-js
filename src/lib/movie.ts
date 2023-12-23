@@ -70,6 +70,21 @@ export class Movie {
     // this.frameData = output;
     return output; //.buffer;
   }
+  size(isCompressed: boolean = false) {
+    let nBytes = 0;
+    // for each frame, determine number of leds
+    this.frameData.forEach((frame) => {
+      let leds = frame.leds;
+      if (isCompressed) {
+        leds = frame.leds.filter((led) => {
+          return led.red != 0 && led.green != 0 && led.blue != 0;
+        });
+      }
+      let numNonBlackLeds = leds.length;
+      nBytes += numNonBlackLeds * 3;
+    });
+    return nBytes;
+  }
 }
 
 function generateUUID() {
