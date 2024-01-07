@@ -10,11 +10,11 @@ export default class FetchWrapper {
     this.timeout = timeout;
   }
 
-  addHeaders(newHeaders: Record<string, string>) {
+  public addHeaders(newHeaders: Record<string, string>) {
     this.defaults.headers = { ...this.defaults.headers, ...newHeaders };
   }
 
-  async request(
+  public async request(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<FetchResponse> {
@@ -39,11 +39,14 @@ export default class FetchWrapper {
     }
   }
 
-  async get(endpoint: string, options: RequestInit = {}): Promise<Response> {
+  public async get(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<Response> {
     return this.request(endpoint, { ...options, method: "GET" });
   }
 
-  async post(
+  public async post(
     endpoint: string,
     body: any,
     options: RequestInit = {}
@@ -52,14 +55,14 @@ export default class FetchWrapper {
     return this.request(endpoint, { ...options, method: "POST", body });
   }
 
-  async delete(endpoint: string, data: any): Promise<Response> {
+  public async delete(endpoint: string, data: any): Promise<Response> {
     return this.request(endpoint, {
       method: "DELETE",
       body: JSON.stringify(data),
     });
   }
 
-  async put(
+  public async put(
     endpoint: string,
     body: any,
     options: RequestInit = {}
