@@ -1,5 +1,6 @@
 /// <reference types="node" />
 import { AxiosInstance, AxiosResponse } from "axios";
+import FetchWrapper, { FetchResponse } from "./fetchwrapper.js";
 import { Frame } from "./frame.js";
 import { Movie } from "./movie.js";
 import { rgbColor, hsvColor, deviceMode, timer, coordinate, layout } from "./interfaces.js";
@@ -11,7 +12,7 @@ import { rgbColor, hsvColor, deviceMode, timer, coordinate, layout } from "./int
 export declare class Light {
     ipaddr: string;
     challenge: string;
-    net: AxiosInstance;
+    net: AxiosInstance | FetchWrapper;
     token: AuthenticationToken | undefined;
     activeLoginCall: boolean;
     nleds: number | undefined;
@@ -22,8 +23,28 @@ export declare class Light {
      * @constructor
      * @param {string} ipaddr IP Address of the Twinkly device
      */
-    constructor(ipaddr: string, timeout?: number);
-    autoEndLoginCall(): Promise<void>;
+    constructor(ipaddr: string, timeout?: number, useFetch?: boolean);
+    /**
+     * Sends a POST request to the device, appending the required tokens
+     *
+     * @param {string} url
+     * @param {object} params
+     */
+    sendPostRequest(url: string, data?: any, contentType?: string): Promise<any>;
+    /**
+     * Sends a DELETE request to the device, appending the required tokens
+     *
+     * @param {string} url
+     * @param {object} data
+     */
+    sendDeleteRequest(url: string, data: any): Promise<any>;
+    /**
+     * Sends a GET request to the device, appending the required tokens
+     *
+     * @param {string} url
+     * @param {object} params
+     */
+    sendGetRequest(url: string, params?: object, requiresToken?: boolean): Promise<any>;
     /**
      * Sends a login request
      *
@@ -34,6 +55,10 @@ export declare class Light {
      * Sends a logout request
      */
     logout(): Promise<void>;
+    /**
+     * Automatically ends a login call after 1 second
+     */
+    autoEndLoginCall(): Promise<void>;
     /**
      * Check that we are logged in to the device
      */
@@ -146,26 +171,6 @@ export declare class Light {
      * @param {deviceMode} mode
      */
     setMode(mode: deviceMode): Promise<void>;
-    /**
-     * Sends a POST request to the device, appending the required tokens
-     *
-     * @param {string} url
-     * @param {object} params
-     */
-    sendPostRequest(url: string, data: any, contentType?: string): Promise<any>;
-    /**
-     *
-     * @param {string} url
-     * @param {object} data
-     */
-    sendDeleteRequest(url: string, data: any): Promise<any>;
-    /**
-     * Sends a GET request to the device, appending the required tokens
-     *
-     * @param {string} url
-     * @param {object} params
-     */
-    sendGetRequest(url: string, params?: object, requiresToken?: boolean): Promise<any>;
     /**
      * Send a movie config to the device
      *
@@ -312,9 +317,9 @@ export declare class AuthenticationToken {
      * Creates an instance of AuthenticationToken.
      *
      * @constructor
-     * @param {AxiosResponse} res Response from POST request
+     * @param {AxiosResponse | FetchResponse} res Response from POST request
      */
-    constructor(res: AxiosResponse);
+    constructor(res: AxiosResponse | FetchResponse);
     /**
      *
      * @returns Token as string

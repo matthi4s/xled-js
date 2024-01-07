@@ -1,6 +1,7 @@
 import { generateRandomHex } from "./utils.js";
 
 import axios, { AxiosInstance, AxiosResponse } from "axios";
+import FetchWrapper, { FetchResponse } from "./fetchwrapper.js";
 import delay from "delay";
 // dynamically import udp for compatibility with browser
 // import * as udp from "node:dgram";
@@ -30,7 +31,7 @@ let errNoToken = Error("No valid token");
 export class Light {
   ipaddr: string;
   challenge: string;
-  net: AxiosInstance;
+  net: AxiosInstance | FetchWrapper;
   token: AuthenticationToken | undefined;
   activeLoginCall: boolean;
   nleds: number | undefined;
@@ -41,13 +42,22 @@ export class Light {
    * @constructor
    * @param {string} ipaddr IP Address of the Twinkly device
    */
-  constructor(ipaddr: string, timeout: number = 20000) {
+  constructor(
+    ipaddr: string,
+    timeout: number = 20000,
+    useFetch: boolean = false
+  ) {
     this.ipaddr = ipaddr;
     this.challenge = ""; // default value, will be set in login()
-    this.net = axios.create({
+    const config = {
       baseURL: `http://${this.ipaddr}/xled/v1/`,
       timeout: timeout,
-    });
+    };
+    if (useFetch) {
+      this.net = new FetchWrapper(config.baseURL, config.timeout);
+    } else {
+      this.net = axios.create(config);
+    }
     this.activeLoginCall = false;
 
     // dynamically import udp asynchroniously with IIFE
@@ -68,10 +78,78 @@ export class Light {
       }
     })();
   }
-  async autoEndLoginCall(): Promise<void> {
-    await delay(1000);
-    this.activeLoginCall = false;
+  /**
+   * Sends a POST request to the device, appending the required tokens
+   *
+   * @param {string} url
+   * @param {object} params
+   */
+  async sendPostRequest(
+    url: string,
+    data: any = {},
+    contentType: string = "application/json"
+  ): Promise<any> {
+    if (!this.token) throw errNoToken;
+    let res: AxiosResponse | FetchResponse;
+    try {
+      res = await this.net.post(url, data, {
+        headers: {
+          "Content-Type": contentType,
+        },
+      });
+    } catch (err) {
+      throw err;
+    }
+    if (res.data.code != applicationResponseCode.Ok) {
+      throw Error(`Mode set failed with error code ${res.data.code}`);
+    }
+    return res.data;
   }
+
+  /**
+   * Sends a DELETE request to the device, appending the required tokens
+   *
+   * @param {string} url
+   * @param {object} data
+   */
+  async sendDeleteRequest(url: string, data: any): Promise<any> {
+    if (!this.token) throw errNoToken;
+    let res: AxiosResponse | FetchResponse;
+    try {
+      res = await this.net.delete(url, data);
+    } catch (err) {
+      throw err;
+    }
+    if (res.data.code != applicationResponseCode.Ok) {
+      throw Error(`Mode set failed with error code ${res.data.code}`);
+    }
+    return res.data;
+  }
+
+  /**
+   * Sends a GET request to the device, appending the required tokens
+   *
+   * @param {string} url
+   * @param {object} params
+   */
+  async sendGetRequest(
+    url: string,
+    params?: object,
+    requiresToken: boolean = true
+  ): Promise<any> {
+    if (!this.token && requiresToken) throw errNoToken;
+    let res: AxiosResponse | FetchResponse;
+    try {
+      res = await this.net.get(url, params || {});
+    } catch (err) {
+      throw err;
+    }
+    if (res.data.code != applicationResponseCode.Ok) {
+      throw Error(`Request failed with error code ${res.data.code}`);
+    }
+    return res.data;
+  }
+
   /**
    * Sends a login request
    *
@@ -80,7 +158,7 @@ export class Light {
   async login(): Promise<void> {
     this.activeLoginCall = true;
     this.autoEndLoginCall();
-    let res: AxiosResponse;
+    let res: AxiosResponse | FetchResponse;
     this.challenge = await generateRandomHex(256);
 
     try {
@@ -107,13 +185,23 @@ export class Light {
    * Sends a logout request
    */
   async logout(): Promise<void> {
-    await this.sendPostRequest("/logout", {});
+    await this.sendPostRequest("/logout");
+  }
+  /**
+   * Automatically ends a login call after 1 second
+   */
+  async autoEndLoginCall(): Promise<void> {
+    await delay(1000);
+    if (this.activeLoginCall) {
+      this.activeLoginCall = false;
+      console.warn("Login call timed out");
+    }
   }
   /**
    * Check that we are logged in to the device
    */
   async verify(): Promise<void> {
-    let res: AxiosResponse;
+    let res: AxiosResponse | FetchResponse;
     if (this.token === undefined) throw errNoToken;
     try {
       res = await this.net.post("/verify", {
@@ -340,77 +428,6 @@ export class Light {
    */
   async setMode(mode: deviceMode): Promise<void> {
     await this.sendPostRequest("/led/mode", { mode: mode });
-  }
-
-  /**
-   * Sends a POST request to the device, appending the required tokens
-   *
-   * @param {string} url
-   * @param {object} params
-   */
-  async sendPostRequest(
-    url: string,
-    data: any,
-    contentType: string = "application/json"
-  ): Promise<any> {
-    if (!this.token) throw errNoToken;
-    let res: AxiosResponse;
-    try {
-      res = await this.net.post(url, data, {
-        headers: {
-          "Content-Type": contentType,
-        },
-      });
-    } catch (err) {
-      throw err;
-    }
-    if (res.data.code != applicationResponseCode.Ok) {
-      throw Error(`Mode set failed with error code ${res.data.code}`);
-    }
-    return res.data;
-  }
-
-  /**
-   *
-   * @param {string} url
-   * @param {object} data
-   */
-  async sendDeleteRequest(url: string, data: any): Promise<any> {
-    if (!this.token) throw errNoToken;
-    let res: AxiosResponse;
-    try {
-      res = await this.net.delete(url, data);
-    } catch (err) {
-      throw err;
-    }
-    if (res.data.code != applicationResponseCode.Ok) {
-      throw Error(`Mode set failed with error code ${res.data.code}`);
-    }
-    return res.data;
-  }
-
-  /**
-   * Sends a GET request to the device, appending the required tokens
-   *
-   * @param {string} url
-   * @param {object} params
-   */
-  async sendGetRequest(
-    url: string,
-    params?: object,
-    requiresToken: boolean = true
-  ): Promise<any> {
-    if (!this.token && requiresToken) throw errNoToken;
-    let res: AxiosResponse;
-    try {
-      res = await this.net.get(url, params || {});
-    } catch (err) {
-      throw err;
-    }
-    if (res.data.code != applicationResponseCode.Ok) {
-      throw Error(`Request failed with error code ${res.data.code}`);
-    }
-    return res.data;
   }
   /**
    * Send a movie config to the device
@@ -688,9 +705,9 @@ export class AuthenticationToken {
    * Creates an instance of AuthenticationToken.
    *
    * @constructor
-   * @param {AxiosResponse} res Response from POST request
+   * @param {AxiosResponse | FetchResponse} res Response from POST request
    */
-  constructor(res: AxiosResponse) {
+  constructor(res: AxiosResponse | FetchResponse) {
     this.token = res.data.authentication_token;
     this.expiry = new Date(
       Date.now() + res.data.authentication_token_expires_in * 1000

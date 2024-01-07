@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { generateRandomHex } from "./utils.js";
 import axios from "axios";
+import FetchWrapper from "./fetchwrapper.js";
 import delay from "delay";
 // dynamically import udp for compatibility with browser
 // import * as udp from "node:dgram";
@@ -30,13 +31,19 @@ export class Light {
      * @constructor
      * @param {string} ipaddr IP Address of the Twinkly device
      */
-    constructor(ipaddr, timeout = 20000) {
+    constructor(ipaddr, timeout = 20000, useFetch = false) {
         this.ipaddr = ipaddr;
         this.challenge = ""; // default value, will be set in login()
-        this.net = axios.create({
+        const config = {
             baseURL: `http://${this.ipaddr}/xled/v1/`,
             timeout: timeout,
-        });
+        };
+        if (useFetch) {
+            this.net = new FetchWrapper(config.baseURL, config.timeout);
+        }
+        else {
+            this.net = axios.create(config);
+        }
         this.activeLoginCall = false;
         // dynamically import udp asynchroniously with IIFE
         (() => __awaiter(this, void 0, void 0, function* () {
@@ -57,10 +64,77 @@ export class Light {
             }
         }))();
     }
-    autoEndLoginCall() {
+    /**
+     * Sends a POST request to the device, appending the required tokens
+     *
+     * @param {string} url
+     * @param {object} params
+     */
+    sendPostRequest(url, data = {}, contentType = "application/json") {
         return __awaiter(this, void 0, void 0, function* () {
-            yield delay(1000);
-            this.activeLoginCall = false;
+            if (!this.token)
+                throw errNoToken;
+            let res;
+            try {
+                res = yield this.net.post(url, data, {
+                    headers: {
+                        "Content-Type": contentType,
+                    },
+                });
+            }
+            catch (err) {
+                throw err;
+            }
+            if (res.data.code != applicationResponseCode.Ok) {
+                throw Error(`Mode set failed with error code ${res.data.code}`);
+            }
+            return res.data;
+        });
+    }
+    /**
+     * Sends a DELETE request to the device, appending the required tokens
+     *
+     * @param {string} url
+     * @param {object} data
+     */
+    sendDeleteRequest(url, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.token)
+                throw errNoToken;
+            let res;
+            try {
+                res = yield this.net.delete(url, data);
+            }
+            catch (err) {
+                throw err;
+            }
+            if (res.data.code != applicationResponseCode.Ok) {
+                throw Error(`Mode set failed with error code ${res.data.code}`);
+            }
+            return res.data;
+        });
+    }
+    /**
+     * Sends a GET request to the device, appending the required tokens
+     *
+     * @param {string} url
+     * @param {object} params
+     */
+    sendGetRequest(url, params, requiresToken = true) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.token && requiresToken)
+                throw errNoToken;
+            let res;
+            try {
+                res = yield this.net.get(url, params || {});
+            }
+            catch (err) {
+                throw err;
+            }
+            if (res.data.code != applicationResponseCode.Ok) {
+                throw Error(`Request failed with error code ${res.data.code}`);
+            }
+            return res.data;
         });
     }
     /**
@@ -102,7 +176,19 @@ export class Light {
      */
     logout() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.sendPostRequest("/logout", {});
+            yield this.sendPostRequest("/logout");
+        });
+    }
+    /**
+     * Automatically ends a login call after 1 second
+     */
+    autoEndLoginCall() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield delay(1000);
+            if (this.activeLoginCall) {
+                this.activeLoginCall = false;
+                console.warn("Login call timed out");
+            }
         });
     }
     /**
@@ -358,78 +444,6 @@ export class Light {
     setMode(mode) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.sendPostRequest("/led/mode", { mode: mode });
-        });
-    }
-    /**
-     * Sends a POST request to the device, appending the required tokens
-     *
-     * @param {string} url
-     * @param {object} params
-     */
-    sendPostRequest(url, data, contentType = "application/json") {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.token)
-                throw errNoToken;
-            let res;
-            try {
-                res = yield this.net.post(url, data, {
-                    headers: {
-                        "Content-Type": contentType,
-                    },
-                });
-            }
-            catch (err) {
-                throw err;
-            }
-            if (res.data.code != applicationResponseCode.Ok) {
-                throw Error(`Mode set failed with error code ${res.data.code}`);
-            }
-            return res.data;
-        });
-    }
-    /**
-     *
-     * @param {string} url
-     * @param {object} data
-     */
-    sendDeleteRequest(url, data) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.token)
-                throw errNoToken;
-            let res;
-            try {
-                res = yield this.net.delete(url, data);
-            }
-            catch (err) {
-                throw err;
-            }
-            if (res.data.code != applicationResponseCode.Ok) {
-                throw Error(`Mode set failed with error code ${res.data.code}`);
-            }
-            return res.data;
-        });
-    }
-    /**
-     * Sends a GET request to the device, appending the required tokens
-     *
-     * @param {string} url
-     * @param {object} params
-     */
-    sendGetRequest(url, params, requiresToken = true) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.token && requiresToken)
-                throw errNoToken;
-            let res;
-            try {
-                res = yield this.net.get(url, params || {});
-            }
-            catch (err) {
-                throw err;
-            }
-            if (res.data.code != applicationResponseCode.Ok) {
-                throw Error(`Request failed with error code ${res.data.code}`);
-            }
-            return res.data;
         });
     }
     /**
@@ -720,7 +734,7 @@ export class AuthenticationToken {
      * Creates an instance of AuthenticationToken.
      *
      * @constructor
-     * @param {AxiosResponse} res Response from POST request
+     * @param {AxiosResponse | FetchResponse} res Response from POST request
      */
     constructor(res) {
         this.token = res.data.authentication_token;
