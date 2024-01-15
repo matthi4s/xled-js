@@ -36,6 +36,7 @@ export class Light {
   activeLoginCall: boolean;
   nleds: number | undefined;
   udpClient: any; //udp.Socket;
+  rgbw: boolean = false;
   /**
    * Creates an instance of Light.
    *
@@ -45,9 +46,11 @@ export class Light {
   constructor(
     ipaddr: string,
     timeout: number = 20000,
-    useFetch: boolean = false
+    useFetch: boolean = false,
+    rgbw: boolean = false
   ) {
     this.ipaddr = ipaddr;
+    this.rgbw = rgbw;
     this.challenge = ""; // default value, will be set in login()
     const config = {
       baseURL: `http://${this.ipaddr}/xled/v1/`,
@@ -471,7 +474,7 @@ export class Light {
   async sendMovieToDevice(movie: Movie) {
     let res = await this.sendPostRequest(
       "led/movie/full",
-      movie.toOctet(),
+      movie.toOctet(this.rgbw),
       "application/octet-stream"
     );
     return res;
@@ -485,7 +488,7 @@ export class Light {
   async sendRealTimeFrame(frame: Frame) {
     let res = await this.sendPostRequest(
       "led/rt/frame",
-      frame.toOctet(),
+      frame.toOctet(this.rgbw),
       "application/octet-stream"
     );
     return res;
@@ -504,7 +507,7 @@ export class Light {
     // Generate the header
     let tokenArray = this.token.getTokenDecoded();
 
-    let rawFrame = frame.toOctet();
+    let rawFrame = frame.toOctet(this.rgbw);
     let packetId = 0;
     do {
       let framePart = rawFrame.slice(0, 900);
@@ -551,7 +554,7 @@ export class Light {
     await this.sendPostRequest("/movies/new", movie.export());
     let res = await this.sendPostRequest(
       "/movies/full",
-      movie.toOctet(),
+      movie.toOctet(this.rgbw),
       "application/octet-stream"
     );
     return res;
@@ -611,6 +614,40 @@ export class Light {
     this.nleds = nleds;
     return nleds;
   }
+
+  /**
+   * Check if the current device is RGBW
+   *
+   * @returns {Promise<boolean>}
+   */
+  async getRGBW(): Promise<boolean> {
+    let res: any = await this.getDeviceDetails();
+    return res.led_profile === "RGBW";
+  }
+
+  /**
+   * Enable RGBW mode for this device
+   *
+   * Sends all frames/movies with additional white channel
+   * This must be enabled for RGBW devices, otherwise the colors might be wrong
+   *
+   * @returns {Light} this
+   */
+  enableRGBW(): this {
+    this.rgbw = true;
+    return this;
+  }
+
+  /**
+   * Enable the RGBW mode for this device if it is RGBW
+   *
+   * @returns {boolean}
+   */
+  async autoDetectRGBW(): Promise<boolean> {
+    this.rgbw = await this.getRGBW();
+    return this.rgbw;
+  }
+
   /**
    * Get the current MQTT config
    *

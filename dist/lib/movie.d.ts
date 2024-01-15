@@ -19,6 +19,6 @@ export declare class Movie {
         frames_number: number;
         fps: number;
     };
-    toOctet(): Uint8Array;
-    size(isCompressed?: boolean): number;
+    toOctet(rgbw?: boolean): Uint8Array;
+    size(isCompressed?: boolean, rgbw?: boolean): number;
 }

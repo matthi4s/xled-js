@@ -18,15 +18,16 @@ export class Frame {
     /**
      * Output the frame as a Uint8Array of bytes
      *
+     * @param {boolean} rgbw Whether the output should be RGBW or not.
      * @returns {Uint8Array}
      */
-    toOctet() {
-        let buffer = new ArrayBuffer(this.leds.length * 3);
-        let output = new Uint8Array(buffer);
+    toOctet(rgbw = false) {
+        let ledLength = rgbw ? 4 : 3;
+        let output = new Uint8Array(this.leds.length * ledLength);
         let offset = 0;
         this.leds.forEach((led) => {
-            output.set(led.toOctet(), offset);
-            offset += 3;
+            output.set(led.toOctet(rgbw), offset);
+            offset += ledLength;
         });
         return output;
     }

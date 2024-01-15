@@ -31,8 +31,10 @@ export class Light {
      * @constructor
      * @param {string} ipaddr IP Address of the Twinkly device
      */
-    constructor(ipaddr, timeout = 20000, useFetch = false) {
+    constructor(ipaddr, timeout = 20000, useFetch = false, rgbw = false) {
+        this.rgbw = false;
         this.ipaddr = ipaddr;
+        this.rgbw = rgbw;
         this.challenge = ""; // default value, will be set in login()
         const config = {
             baseURL: `http://${this.ipaddr}/xled/v1/`,
@@ -486,7 +488,7 @@ export class Light {
      */
     sendMovieToDevice(movie) {
         return __awaiter(this, void 0, void 0, function* () {
-            let res = yield this.sendPostRequest("led/movie/full", movie.toOctet(), "application/octet-stream");
+            let res = yield this.sendPostRequest("led/movie/full", movie.toOctet(this.rgbw), "application/octet-stream");
             return res;
         });
     }
@@ -498,7 +500,7 @@ export class Light {
      */
     sendRealTimeFrame(frame) {
         return __awaiter(this, void 0, void 0, function* () {
-            let res = yield this.sendPostRequest("led/rt/frame", frame.toOctet(), "application/octet-stream");
+            let res = yield this.sendPostRequest("led/rt/frame", frame.toOctet(this.rgbw), "application/octet-stream");
             return res;
         });
     }
@@ -516,7 +518,7 @@ export class Light {
                 throw new Error("UDP not supported in browser");
             // Generate the header
             let tokenArray = this.token.getTokenDecoded();
-            let rawFrame = frame.toOctet();
+            let rawFrame = frame.toOctet(this.rgbw);
             let packetId = 0;
             do {
                 let framePart = rawFrame.slice(0, 900);
@@ -563,7 +565,7 @@ export class Light {
     addMovie(movie) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.sendPostRequest("/movies/new", movie.export());
-            let res = yield this.sendPostRequest("/movies/full", movie.toOctet(), "application/octet-stream");
+            let res = yield this.sendPostRequest("/movies/full", movie.toOctet(this.rgbw), "application/octet-stream");
             return res;
         });
     }
@@ -623,6 +625,40 @@ export class Light {
             let nleds = res.number_of_led;
             this.nleds = nleds;
             return nleds;
+        });
+    }
+    /**
+     * Check if the current device is RGBW
+     *
+     * @returns {Promise<boolean>}
+     */
+    getRGBW() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let res = yield this.getDeviceDetails();
+            return res.led_profile === "RGBW";
+        });
+    }
+    /**
+     * Enable RGBW mode for this device
+     *
+     * Sends all frames/movies with additional white channel
+     * This must be enabled for RGBW devices, otherwise the colors might be wrong
+     *
+     * @returns {Light} this
+     */
+    enableRGBW() {
+        this.rgbw = true;
+        return this;
+    }
+    /**
+     * Enable the RGBW mode for this device if it is RGBW
+     *
+     * @returns {boolean}
+     */
+    autoDetectRGBW() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.rgbw = yield this.getRGBW();
+            return this.rgbw;
         });
     }
     /**

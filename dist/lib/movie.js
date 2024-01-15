@@ -34,26 +34,28 @@ export class Movie {
             fps: this.fps,
         };
     }
-    toOctet() {
+    toOctet(rgbw = false) {
         const frames = this.frameData;
         this.frames_number = frames.length;
         this.leds_per_frame = frames[0].getNLeds();
-        const buffer = new ArrayBuffer(this.frames_number * this.leds_per_frame * 3);
+        let ledLength = rgbw ? 4 : 3;
+        const buffer = new ArrayBuffer(this.frames_number * this.leds_per_frame * ledLength);
         const output = new Uint8Array(buffer);
         frames.forEach((frame, index) => {
             if (frame.getNLeds() != this.leds_per_frame)
                 throw new Error("Frames must all be the same length");
             // convert to octet
-            let octet = frame.toOctet();
+            let octet = frame.toOctet(rgbw);
             // add octet to output
-            let offset = index * this.leds_per_frame * 3;
+            let offset = index * this.leds_per_frame * ledLength;
             output.set(octet, offset);
         });
         // this.frameData = output;
         return output; //.buffer;
     }
-    size(isCompressed = false) {
+    size(isCompressed = false, rgbw = false) {
         let nBytes = 0;
+        let ledLength = rgbw ? 4 : 3;
         // for each frame, determine number of leds
         this.frameData.forEach((frame) => {
             let leds = frame.leds;
@@ -63,7 +65,7 @@ export class Movie {
                 });
             }
             let numNonBlackLeds = leds.length;
-            nBytes += numNonBlackLeds * 3;
+            nBytes += numNonBlackLeds * ledLength;
         });
         return nBytes;
     }

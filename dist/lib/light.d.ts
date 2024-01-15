@@ -17,13 +17,14 @@ export declare class Light {
     activeLoginCall: boolean;
     nleds: number | undefined;
     udpClient: any;
+    rgbw: boolean;
     /**
      * Creates an instance of Light.
      *
      * @constructor
      * @param {string} ipaddr IP Address of the Twinkly device
      */
-    constructor(ipaddr: string, timeout?: number, useFetch?: boolean);
+    constructor(ipaddr: string, timeout?: number, useFetch?: boolean, rgbw?: boolean);
     /**
      * Sends a POST request to the device, appending the required tokens
      *
@@ -246,6 +247,27 @@ export declare class Light {
      * @returns number of LEDs in the device
      */
     getNLeds(): Promise<number>;
+    /**
+     * Check if the current device is RGBW
+     *
+     * @returns {Promise<boolean>}
+     */
+    getRGBW(): Promise<boolean>;
+    /**
+     * Enable RGBW mode for this device
+     *
+     * Sends all frames/movies with additional white channel
+     * This must be enabled for RGBW devices, otherwise the colors might be wrong
+     *
+     * @returns {Light} this
+     */
+    enableRGBW(): this;
+    /**
+     * Enable the RGBW mode for this device if it is RGBW
+     *
+     * @returns {boolean}
+     */
+    autoDetectRGBW(): Promise<boolean>;
     /**
      * Get the current MQTT config
      *

@@ -36,7 +36,7 @@ import { Light, rgbColor } from "xled-js";
 
 async function run() {
 	// instantiate the device
-	device = new Light("192.168.1.164");
+	let device = new Light("192.168.1.164");
 	// get the device name
 	console.log(`This device is called ${await device.getName()}`);
 
@@ -52,6 +52,11 @@ async function run() {
 	await device.setRGBColor(red);
 }
 run();
+```
+
+If you are using an RGBW device, you should enable RGBW mode if you want to send frames or movies.
+```ts
+let device = new Light("192.168.1.164").enableRGBW();
 ```
 
 ### Discovery Service

@@ -18,9 +18,10 @@ export declare class Frame {
     /**
      * Output the frame as a Uint8Array of bytes
      *
+     * @param {boolean} rgbw Whether the output should be RGBW or not.
      * @returns {Uint8Array}
      */
-    toOctet(): Uint8Array;
+    toOctet(rgbw?: boolean): Uint8Array;
     /**
      * Get the number of LEDs in this frame
      *
