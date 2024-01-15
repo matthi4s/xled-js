@@ -516,12 +516,12 @@ export class Light {
                 throw new Error("UDP not supported in browser");
             // Generate the header
             let tokenArray = this.token.getTokenDecoded();
-            let udpHeader = Buffer.alloc(tokenArray.length + 4);
             let rawFrame = frame.toOctet();
             let packetId = 0;
             do {
                 let framePart = rawFrame.slice(0, 900);
                 rawFrame = rawFrame.slice(900);
+                let udpHeader = Buffer.alloc(tokenArray.length + 4);
                 udpHeader.writeUInt8(0x03); // the version number
                 udpHeader.fill(tokenArray, 1); // the actual token, 8 bytes
                 udpHeader.writeUInt8(0x00, tokenArray.length + 1); // zero blanking
